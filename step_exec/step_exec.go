@@ -41,7 +41,7 @@ func join(tasks *int, done chan error) {
 		select {
 		case err := <-done:
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "error: %v", err)
+				fmt.Fprintf(os.Stderr, "error: %v and done\n", err)
 			}
 		}
 	}

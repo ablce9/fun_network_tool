@@ -1,0 +1,78 @@
+#! /usr/bin/env python
+
+import os
+import sys
+import getopt
+import signal
+import subprocess
+
+
+def parse_opt(args):
+    kill = False
+    opt, _ = getopt.getopt(args, 'kp:')
+    for o, a in opt:
+        if o == '-k':
+            kill = True
+    return kill
+
+
+def usage():
+    sys.stderr.write("""%s -f SRCFILE [CMD...]
+""" % (__file__,))
+    sys.exit(1)
+
+
+def func(src, cmds):
+    def handle_exit(sig, _):
+        if sig == signal.SIGTERM:
+            sys.exit(0)
+        sys.exit(1)
+
+    signal.signal(signal.SIGTERM, handle_exit)
+    signal.signal(signal.SIGINT, handle_exit)
+    is_child = False
+    children = []
+    with open(src, 'rb') as f:
+        data = f.read().split()
+
+    for i in range(0, len(data)):
+        r = os.fork()
+        if r == 0:
+            is_child = True
+            cmds.append(data[i])
+            subprocess.call(cmds)
+            break
+        else:
+            children.append(r)
+    if not is_child:
+        def sig_func(sig, _):
+            for pid in children:
+                try:
+                    os.kill(pid, sig)
+                    os.waitpid(pid, 0)
+                except KeyboardInterrupt:
+                    pass
+            sys.exit()
+        signal.signal(signal.SIGTERM, sig_func)
+        signal.signal(signal.SIGQUIT, sig_func)
+        signal.signal(signal.SIGINT, sig_func)
+
+        for child in children:
+            os.waitpid(child, 0)
+
+
+if __name__ == "__main__":
+    v = sys.argv[1:]
+    try:
+        if v[0] == "--help" or v[0] == "-h":
+            usage()
+    except IndexError:
+        sys.exit(1)
+    opt, _ = getopt.getopt(v, 'f:', ["help", "output="])
+    src = 'src.txt'
+    for o, a in opt:
+        if o == '-f':
+            src = a
+    cmd = v[2:]
+    func(src, cmd)
+    print("done")

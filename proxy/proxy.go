@@ -1,5 +1,3 @@
-// license that can be found in the LICENSE file.
-
 // Simple proxy server
 // stallion.local has two net interfaces 10.42.0.1 and 192.168.0.1 but poney.local doesn't have
 // access to 192.168.0.1 for some reason. Then, stallion.local can run me:
