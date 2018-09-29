@@ -38,11 +38,9 @@ func Command(name string, args []string) *exec.Cmd {
 func join(tasks *int, done chan error) {
 	fmt.Printf("have %d tasks\n", *tasks)
 	for i := 0; i < *tasks; i++ {
-		select {
-		case err := <-done:
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "error: %v and done\n", err)
-			}
+		err := <-done
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v and done\n", err)
 		}
 	}
 	*tasks = 0
@@ -72,7 +70,7 @@ func main() {
 		go func() {
 			done <- command.Wait()
 		}()
-		if current > step {
+		if current > step-1 {
 			// Wait til all jobs are done.
 			join(&current, done)
 		}
