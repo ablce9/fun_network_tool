@@ -14,6 +14,10 @@ var (
 	listen     string
 	wslisten   string
 	wsRefc     int
+	// TODO:
+	// This is bad because we cannot deal with closed connections.
+	// The order matters too much so we should use some stuff with
+	// which we can deal with the order.
 	wsConnPool []*websocket.Conn
 )
 
