@@ -10,13 +10,13 @@ import (
 )
 
 var (
+	wslisten   string
 	listen   string
-	wslisten string
 )
 
 func init() {
 	flag.StringVar(&listen, "addr", "127.0.0.1:4000", "server address")
-	flag.StringVar(&wslisten, "wsaddr", "127.0.0.1:4001", "websocket server address")
+	flag.StringVar(&wslisten, "wsaddr", "server.net", "websocket server address")
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -84,31 +84,22 @@ func (s wsserver) chatHandler(ws *websocket.Conn) {
 	}
 }
 
-func runWSServer(listen string, ch chan error) {
+func runServer(listen string, ch chan error) {
 	s := wsserver{
 		srv: &WSServer{
 			list.New(),
 		},
 	}
-	s.h = s.srv
-	http.Handle("/chat-room", websocket.Handler(s.chatHandler))
-	log.Print("WebSocket server listening on ", listen)
-	err := http.ListenAndServe(listen, nil)
-	ch <- err
-}
-
-func runServer(listen string, ch chan error) {
 	http.HandleFunc("/", indexHandler)
+	http.Handle("/chat-room", websocket.Handler(s.chatHandler))
 	log.Print("HttpServer listening on ", listen)
-	err := http.ListenAndServe(listen, nil)
-	ch <- err
+	ch <- http.ListenAndServe(listen, nil)
 }
 
 func main() {
 	flag.Parse()
-	errCh := make(chan error, 2)
+	errCh := make(chan error, 1)
 	go runServer(listen, errCh)
-	go runWSServer(wslisten, errCh)
 	for e := range errCh {
 		if e != nil {
 			panic(e)

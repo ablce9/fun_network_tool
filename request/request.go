@@ -111,9 +111,6 @@ func request(uri string) {
 			failed++
 		}
 	}()
-	if err != nil {
-		panic(err)
-	}
 	defer res.Body.Close()
 
 	index := strings.LastIndex(url.Path, "/")
