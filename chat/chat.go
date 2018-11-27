@@ -90,6 +90,7 @@ func runServer(listen string, ch chan error) {
 			list.New(),
 		},
 	}
+	s.h = s.srv
 	http.HandleFunc("/", indexHandler)
 	http.Handle("/chat-room", websocket.Handler(s.chatHandler))
 	log.Print("HttpServer listening on ", listen)
