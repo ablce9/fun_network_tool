@@ -3,18 +3,12 @@ package main
 import "fmt"
 
 // App is like jsx.
-func App(wsserver string) string {
+func App(server, wsserver string) string {
         return fmt.Sprintf(`<html>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1">
         <style type="text/css">
-         body {
-             width: 100%%;
-             font-family: sans-serif;
-             margin: 0;
-             padding: 0;
-         }
          @media screen and (.webkit-min-device-pixel-ration:0) {
              select,
              textarea,
@@ -22,9 +16,14 @@ func App(wsserver string) string {
                  front-size: 20px;
              }
          }
+         body {
+             width: 100%%;
+             font-family: sans-serif;
+             margin: 0;
+             padding: 0;
+         }
          #container {
-             position: relative;
-             font-family: helvetica;
+             font-family: sans-serif;
          }
          #bottom {
              position: fixed;
@@ -32,6 +31,7 @@ func App(wsserver string) string {
          }
          #messages {
              padding: 0em 0em;
+             margin: 5px;
          }
          ul, li {
              list-style: none;
@@ -49,7 +49,10 @@ func App(wsserver string) string {
     <body>
         <div id="container">
             <div id="message-grid">
-                <ul id="messages"></ul>
+                <ul id="messages">
+                    <li style="color:blue">websocket address:%s</li>
+                    <li style="color:red">server address:%s</li>
+                </ul>
             </div>
             <div id="bottom">
                 <input id="input-field" />
@@ -94,5 +97,5 @@ func App(wsserver string) string {
         </script>
     </body>
 </html>
-`, wsserver)
+`, wsserver, server, wsserver)
 }

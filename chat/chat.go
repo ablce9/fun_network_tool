@@ -20,7 +20,7 @@ func init() {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	app := App(wslisten)
+	app := App(listen, wslisten,)
 	w.Write([]byte(app))
 }
 
